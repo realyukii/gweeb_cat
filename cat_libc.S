@@ -18,6 +18,8 @@ usage_str:
 .global main
 main:
 	pushq	%rbx
+	pushq	%r12
+
 	cmpl	$2, %edi
 	jne	.print_usage_exit
 
@@ -31,6 +33,8 @@ main:
 	movq	%rax, %rbx
 
 	subq	$1024, %rsp
+	
+.read_contents:
 	/* size_t fread(void *ptr, size_t size, size_t nmemb, FILE* stream); */
 	movq	%rsp, %rdi
 	movl	$1024, %esi
@@ -38,12 +42,18 @@ main:
 	movq	%rbx, %rcx
 	callq	fread
 
+	movl	%eax, %r12d
+
 	leaq	template_str(%rip), %rdi
 	movq	%rsp, %rsi
 	xorl	%eax, %eax
 	callq	printf
 
+	cmpl	$0, %r12d
+	jne	.read_contents
+
 	addq	$1024, %rsp
+	popq	%r12
 	popq	%rbx
 
 	xorl	%eax, %eax
@@ -52,12 +62,18 @@ main:
 .failed_to_open:
 	xorl	%edi, %edi
 	callq	perror
+
+	popq	%r12
+	popq	%rbx
 	
 	movl	$FAILURE_CODE, %eax
 	retq
 .print_usage_exit:
 	leaq	usage_str(%rip), %rdi
 	callq	puts
+
+	popq	%r12
+	popq	%rbx
 
 	movl	$FAILURE_CODE, %eax
 	retq
