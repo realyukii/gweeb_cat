@@ -12,6 +12,18 @@ usage_str:
 .section .text
 .global _start
 _start:
+	/* test print the first command-line argument */
+	movq	16(%rsp), %rsi
+	xorl	%edx, %edx
+.find_len:
+	cmpb	$0, (%rsi, %rdx)
+	je	.got_len
+	incl	%edx
+	jmp .find_len
+.got_len:
+	movl	$STDOUT_FILENO, %edi
+	movl	$SYS_WRITE, %eax
+	syscall
 	/* write(fd, buff_ptr, buff_len) */
 	movl	$SYS_WRITE, %eax
 	movl	$STDOUT_FILENO, %edi
