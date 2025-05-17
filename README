@@ -1,0 +1,3 @@
+a program for reading file contents written in two version:
+- with the help of libc
+- nolibc
