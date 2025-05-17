@@ -59,8 +59,9 @@ _start:
 	movl	$SYS_READ, %eax
 	syscall
 
-	/* save the return value into register instead of stack */
-	mov	%eax, %ebx
+	/* total bytes readed from read */
+	cmpl	$0, %eax
+	je	.finish_reading
 
 	/* write(fd, buff_ptr, buff_len) */
 	movl	$STDOUT_FILENO, %edi
@@ -69,9 +70,8 @@ _start:
 	movl	$SYS_WRITE, %eax
 	syscall
 
-	/* total bytes readed from read */
-	cmpl	$0, %ebx
-	jne	.read_contents
+	jmp	.read_contents
+.finish_reading:
 
 	addq	$BYTES_READ, %rsp
 	/* exit(code) */

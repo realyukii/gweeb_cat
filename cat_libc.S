@@ -18,7 +18,6 @@ usage_str:
 .global main
 main:
 	pushq	%rbx
-	pushq	%r12
 
 	cmpl	$2, %edi
 	jne	.print_usage_exit
@@ -42,20 +41,20 @@ main:
 	movq	%rbx, %rcx
 	callq	fread
 
-	movl	%eax, %r12d
+	cmpl	$0, %eax
+	je	.finish_reading
 
 	/* size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE* stream); */
 	movq	%rsp, %rdi
 	movl	$1, %esi
-	movl	%r12d, %edx
+	movl	%eax, %edx
 	movq	stdout(%rip), %rcx
 	callq	fwrite
 
-	cmpl	$0, %r12d
-	jne	.read_contents
+	jmp	.read_contents
+.finish_reading:
 
 	addq	$1024, %rsp
-	popq	%r12
 	popq	%rbx
 
 	xorl	%eax, %eax
@@ -65,7 +64,6 @@ main:
 	xorl	%edi, %edi
 	callq	perror
 
-	popq	%r12
 	popq	%rbx
 	
 	movl	$FAILURE_CODE, %eax
@@ -74,7 +72,6 @@ main:
 	leaq	usage_str(%rip), %rdi
 	callq	puts
 
-	popq	%r12
 	popq	%rbx
 
 	movl	$FAILURE_CODE, %eax
