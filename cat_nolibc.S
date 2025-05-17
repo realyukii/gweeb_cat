@@ -5,6 +5,7 @@
 
 .equ STDOUT_FILENO,	1
 .equ O_RDONLY,		0
+.equ BYTES_READ,	1024
 
 .section .rodata
 usage_str:
@@ -17,6 +18,7 @@ failed_open_str:
 .section .text
 .global _start
 _start:
+	/* test argc: to check atleast we have one argument passed */
 	movq	(%rsp), %rax
 	cmpl	$2, %eax
 	je	.have_arg1
@@ -44,13 +46,34 @@ _start:
 	cmpl	$0, %eax
 	jl	.failed_open
 
-	/* write(fd, buff_ptr, buff_len) */
-	movl	$SYS_WRITE, %eax
-	movl	$STDOUT_FILENO, %edi
-	leaq	usage_str(%rip), %rsi
-	movl	$usage_str_len, %edx
+	/* save open-file descriptor to the memory */
+	subq	$8, %rsp
+	movl	%eax, (%rsp)
+	/* allocate buff */
+	subq	$BYTES_READ, %rsp
+	/* read the file contents */
+.read_contents:
+	/* read(fd, buff, count) */
+	movl	BYTES_READ(%rsp), %edi
+	movq	%rsp, %rsi
+	movl	$BYTES_READ, %edx
+	movl	$SYS_READ, %eax
 	syscall
-	
+
+	/* save the return value into register instead of stack */
+	mov	%eax, %ebx
+
+	/* write(fd, buff_ptr, buff_len) */
+	movl	$STDOUT_FILENO, %edi
+	movq	%rsp, %rsi
+	movl	%eax, %edx
+	movl	$SYS_WRITE, %eax
+	syscall
+
+	/* total bytes readed from read */
+	cmpl	$0, %ebx
+	jne	.read_contents
+
 	/* exit(code) */
 	movl	$SYS_EXIT, %eax
 	xorl	%edi, %edi
