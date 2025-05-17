@@ -1,10 +1,10 @@
 format ELF64 executable
 
-SYS_EXIT=60
-SYS_READ=0
-SYS_WRITE=1
+SYS_EXIT	= 60
+SYS_READ	= 0
+SYS_WRITE	= 1
 
-STDOUT_FILENO=1
+STDOUT_FILENO	= 1
 
 _start:
 	; write(fd, buff_ptr, buff_len)
