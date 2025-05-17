@@ -6,6 +6,8 @@
 .extern fopen
 
 .section .rodata
+template_str:
+	.string "%s"
 open_mode:
 	.string "r"
 usage_str:
@@ -15,6 +17,7 @@ usage_str:
 .section .text
 .global main
 main:
+	pushq	%rbx
 	cmpl	$2, %edi
 	jne	.print_usage_exit
 
@@ -24,6 +27,24 @@ main:
 
 	test	%eax, %eax
 	je	.failed_to_open
+
+	movq	%rax, %rbx
+
+	subq	$1024, %rsp
+	/* size_t fread(void *ptr, size_t size, size_t nmemb, FILE* stream); */
+	movq	%rsp, %rdi
+	movl	$1024, %esi
+	movl	$1, %edx
+	movq	%rbx, %rcx
+	callq	fread
+
+	leaq	template_str(%rip), %rdi
+	movq	%rsp, %rsi
+	xorl	%eax, %eax
+	callq	printf
+
+	addq	$1024, %rsp
+	popq	%rbx
 
 	xorl	%eax, %eax
 	retq
