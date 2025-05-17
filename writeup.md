@@ -1,4 +1,4 @@
-## Dokumentasi yang digunakan selama proses pembuatan program
+## sumber yang digunakan selama proses pembuatan program
 
 - `write(2)`
 - `open(2)`
