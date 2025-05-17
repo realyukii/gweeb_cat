@@ -5,7 +5,7 @@
 .equ STDOUT_FILENO,	1
 
 .section .rodata
-.usage_str:
+usage_str:
 	.string "cat <file>\n"
 	usage_str_len = . - usage_str
 
