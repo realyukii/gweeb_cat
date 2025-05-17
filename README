@@ -8,4 +8,4 @@ features:
 * check if specified file exists
 
 development:
-compiled with fasm with intel syntax
+compiled by gcc with AT&T syntax
