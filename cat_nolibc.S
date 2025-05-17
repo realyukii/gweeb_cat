@@ -73,6 +73,7 @@ _start:
 	cmpl	$0, %ebx
 	jne	.read_contents
 
+	addq	$BYTES_READ, %rsp
 	/* exit(code) */
 	movl	$SYS_EXIT, %eax
 	xorl	%edi, %edi
