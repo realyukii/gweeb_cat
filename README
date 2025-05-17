@@ -3,7 +3,8 @@ a x86_64 program for reading file contents written in two version:
 - nolibc
 
 features:
-1. error checking, protect the program from crash unexpectedly:
+0. print simple usage string
+1. (WIP) error checking, protect the program from crash unexpectedly:
 * check if specified file exists
 
 development:
