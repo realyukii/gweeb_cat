@@ -46,15 +46,14 @@ _start:
 	cmpl	$0, %eax
 	jl	.failed_open
 
-	/* save open-file descriptor to the memory */
-	subq	$8, %rsp
-	movl	%eax, (%rsp)
+	/* save open-file descriptor into register instead of stack */
+	movl	%eax, %r12d
 	/* allocate buff */
 	subq	$BYTES_READ, %rsp
 	/* read the file contents */
 .read_contents:
 	/* read(fd, buff, count) */
-	movl	BYTES_READ(%rsp), %edi
+	movl	%r12d, %edi
 	movq	%rsp, %rsi
 	movl	$BYTES_READ, %edx
 	movl	$SYS_READ, %eax
