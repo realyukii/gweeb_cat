@@ -4,10 +4,11 @@
 .extern printf
 .extern fread
 .extern fopen
+.extern perror
+.extern memset
+.extern stdout
 
 .section .rodata
-template_str:
-	.string "%s"
 open_mode:
 	.string "r"
 usage_str:
@@ -35,6 +36,11 @@ main:
 	subq	$1024, %rsp
 	
 .read_contents:
+	movq	%rsp, %rdi
+	movl	$0, %esi
+	movl	$1024, %edx
+	callq	memset
+
 	/* size_t fread(void *ptr, size_t size, size_t nmemb, FILE* stream); */
 	movq	%rsp, %rdi
 	movl	$1024, %esi
@@ -44,10 +50,12 @@ main:
 
 	movl	%eax, %r12d
 
-	leaq	template_str(%rip), %rdi
-	movq	%rsp, %rsi
-	xorl	%eax, %eax
-	callq	printf
+	/* size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE* stream); */
+	movq	%rsp, %rdi
+	movl	$1024, %esi
+	movl	$1, %edx
+	movq	stdout(%rip), %rcx
+	callq	fwrite
 
 	cmpl	$0, %r12d
 	jne	.read_contents
