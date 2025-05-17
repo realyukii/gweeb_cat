@@ -11,3 +11,7 @@
 - [how to define compile-time constants](https://chatgpt.com/share/682824d7-0d54-8002-8d66-32c8fb9f7c00)
 - [count string's length](https://chatgpt.com/share/68282beb-2b34-8002-ad1e-ae42997be2fe)
 - [nolibc - use passed command-line arguments](https://chatgpt.com/share/68283345-a0b4-8002-81fa-6a5f0279ed1d)
+
+## referensi lainnya
+
+- [passing command-line arguments when using gnu debugger](https://stackoverflow.com/questions/6121094/how-do-i-run-a-program-with-commandline-arguments-using-gdb-within-a-bash-script#6121299)

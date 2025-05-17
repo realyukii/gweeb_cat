@@ -12,7 +12,22 @@ usage_str:
 .section .text
 .global _start
 _start:
-	/* test print the first command-line argument */
+	movq	(%rsp), %rax
+	cmp	$2, %rax
+	je	.have_arg1
+.print_usage_exit:
+	/* write(fd, buff_ptr, buff_len) */
+	movl	$SYS_WRITE, %eax
+	movl	$STDOUT_FILENO, %edi
+	leaq	usage_str(%rip), %rsi
+	movl	$usage_str_len, %edx
+	syscall
+
+	/* exit(code) */
+	movl	$SYS_EXIT, %eax
+	movl	$1, %edi
+	syscall
+.have_arg1:
 	movq	16(%rsp), %rsi
 	xorl	%edx, %edx
 .find_len:
@@ -24,13 +39,7 @@ _start:
 	movl	$STDOUT_FILENO, %edi
 	movl	$SYS_WRITE, %eax
 	syscall
-	/* write(fd, buff_ptr, buff_len) */
-	movl	$SYS_WRITE, %eax
-	movl	$STDOUT_FILENO, %edi
-	leaq	usage_str(%rip), %rsi
-	movl	$usage_str_len, %edx
-	syscall
-
+	
 	/* exit(code) */
 	movl	$SYS_EXIT, %eax
 	xorl	%edi, %edi

@@ -8,4 +8,4 @@ features:
 * check if specified file exists
 
 development:
-compiled by gcc with AT&T syntax
+compiled by GNU Assembler (GAS) and GCC with AT&T syntax
