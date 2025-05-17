@@ -5,6 +5,7 @@
 - `read(2)`
 - [linux system call table for x86_64](https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl)
 - [SystemV ABI - calling convention](https://gist.github.com/ammarfaizi2/d7090dd8d667834b51e341732100153e)
+- [SystemV ABI figure 3.4 register usage - callee-saved register](https://gitlab.com/x86-psABIs/x86-64-ABI/-/jobs/artifacts/master/raw/x86-64-ABI/abi.pdf?job=build)
 - [`LEA` vs `MOV` instruction: actual value vs pointer reference](https://stackoverflow.com/questions/1699748/what-is-the-difference-between-mov-and-lea)
 - [displacement vs immediate value](https://chatgpt.com/share/68286701-5ce4-8002-9cdf-a6a2055ecddf)
 
@@ -18,3 +19,4 @@
 ## referensi lainnya
 
 - [passing command-line arguments when using gnu debugger](https://stackoverflow.com/questions/6121094/how-do-i-run-a-program-with-commandline-arguments-using-gdb-within-a-bash-script#6121299)
+- [gdb gef hexdump issue](https://t.me/GNUWeeb/1166032)
