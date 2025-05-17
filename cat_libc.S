@@ -1,11 +1,10 @@
 #define FAILURE_CODE 1
 
 .extern puts
-.extern printf
+.extern fwrite
 .extern fread
 .extern fopen
 .extern perror
-.extern memset
 .extern stdout
 
 .section .rodata
@@ -36,15 +35,10 @@ main:
 	subq	$1024, %rsp
 	
 .read_contents:
-	movq	%rsp, %rdi
-	movl	$0, %esi
-	movl	$1024, %edx
-	callq	memset
-
 	/* size_t fread(void *ptr, size_t size, size_t nmemb, FILE* stream); */
 	movq	%rsp, %rdi
-	movl	$1024, %esi
-	movl	$1, %edx
+	movl	$1, %esi
+	movl	$1024, %edx
 	movq	%rbx, %rcx
 	callq	fread
 
@@ -52,8 +46,8 @@ main:
 
 	/* size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE* stream); */
 	movq	%rsp, %rdi
-	movl	$1024, %esi
-	movl	$1, %edx
+	movl	$1, %esi
+	movl	%r12d, %edx
 	movq	stdout(%rip), %rcx
 	callq	fwrite
 
