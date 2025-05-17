@@ -1,11 +1,13 @@
+#define FAILURE_CODE 1
+
 .extern puts
 .extern printf
 .extern fread
 .extern fopen
 
 .section .rodata
-template_str:
-	.string "argv[1]: %s\n"
+open_mode:
+	.string "r"
 usage_str:
 	.string "cat <file>"
 	usage_str_len = . - usage_str
@@ -16,17 +18,26 @@ main:
 	cmpl	$2, %edi
 	jne	.print_usage_exit
 
-	leaq	template_str(%rip), %rdi
-	movq	8(%rsi), %rsi
-	xorl	%eax, %eax
-	callq	printf
+	movq	8(%rsi), %rdi
+	leaq	open_mode(%rip), %rsi
+	callq	fopen
+
+	test	%eax, %eax
+	je	.failed_to_open
 
 	xorl	%eax, %eax
+	retq
+
+.failed_to_open:
+	xorl	%edi, %edi
+	callq	perror
+	
+	movl	$FAILURE_CODE, %eax
 	retq
 .print_usage_exit:
 	leaq	usage_str(%rip), %rdi
 	callq	puts
 
-	movl	$1, %eax
+	movl	$FAILURE_CODE, %eax
 	retq
 
