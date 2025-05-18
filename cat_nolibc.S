@@ -9,32 +9,27 @@
 
 .section .rodata
 usage_str:
-	.string "cat <file>\n"
+	.string "cat [files]\n"
 	usage_str_len = . - usage_str
 failed_open_str:
-	.string "gagal membuka file.\n"
+	.string "gagal membuka file: "
 	failed_open_str_len = . - failed_open_str
 
 .section .text
 .global _start
 _start:
 	/* test argc: to check atleast we have one argument passed */
-	movq	(%rsp), %rax
-	cmpl	$2, %eax
-	je	.have_arg1
-.print_usage_exit:
-	/* write(fd, buff_ptr, buff_len) */
-	movl	$SYS_WRITE, %eax
-	movl	$STDOUT_FILENO, %edi
-	leaq	usage_str(%rip), %rsi
-	movl	$usage_str_len, %edx
-	syscall
-
-	/* exit(code) */
-	movl	$SYS_EXIT, %eax
-	movl	$1, %edi
-	syscall
-.have_arg1:
+	movl	(%rsp), %r12d
+	cmpl	$2, %r12d
+	jge	.have_args
+.use_stdin:
+	/* if no argument, put stdin file descriptor instead of fd from opened file */
+	xorl	%r12d, %r12d
+	jmp	.skip_open
+.have_args:
+	/* counter for iterating through cmdline args */
+	xorl	%ebx, %ebx
+	
 	/* open(str_path, flag, mode) */
 	movq	16(%rsp), %rdi
 	movl	$O_RDONLY, %esi
@@ -48,6 +43,7 @@ _start:
 
 	/* save open-file descriptor into register instead of stack */
 	movl	%eax, %r12d
+.skip_open:
 	/* allocate buff */
 	subq	$BYTES_READ, %rsp
 	/* read the file contents */
@@ -85,9 +81,4 @@ _start:
 	movl	$STDOUT_FILENO, %edi
 	leaq	failed_open_str(%rip), %rsi
 	movl	$failed_open_str_len, %edx
-	syscall
-	
-	/* exit(code) */
-	movl	$SYS_EXIT, %eax
-	movl	$1, %edi
 	syscall
