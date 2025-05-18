@@ -6,8 +6,8 @@ features:
 0. print simple usage string
 1. error checking, protect the program by prevent it from crash unexpectedly:
 * check if specified file exists
-2. TODO: redirect to stdin when no file provided
-3. TODO: concatenate multiple files
+2. read from stdin if no cmdline arguments supplied 
+3. concatenate multiple files
 
 development:
 compiled by GNU Assembler (GAS) and GCC with AT&T syntax

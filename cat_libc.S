@@ -25,6 +25,9 @@ main:
 
 .use_stdin:
 	movq	stdin(%rip), %rbx
+	movq	%rbx, %rdi
+	xorl	%esi, %esi
+	callq	setlinebuf
 	jmp	.skip_open
 
 .have_args1:
