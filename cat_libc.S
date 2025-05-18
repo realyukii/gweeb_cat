@@ -6,6 +6,7 @@
 .extern sprintf
 .extern fread
 .extern fopen
+.extern fclose
 .extern perror
 .extern stdout
 .extern stdin
@@ -80,6 +81,8 @@ main:
 	cmpl	$0, %r13d
 	je	.exit
 
+	movq	%rbx, %rdi
+	callq	fclose
 	incl	%r12d
 	cmpl	%r13d, %r12d
 	jl	.have_argv1

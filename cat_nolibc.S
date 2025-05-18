@@ -1,9 +1,8 @@
-// TODO: close fd
-// clean callee-saved register
 .equ SYS_EXIT,		60
 .equ SYS_WRITE,		1
 .equ SYS_READ,		0
 .equ SYS_OPEN,		2
+.equ SYS_CLOSE,		3
 
 .equ STDOUT_FILENO,	1
 .equ O_RDONLY,		0
@@ -21,6 +20,12 @@ new_line:
 .section .text
 .global _start
 _start:
+	/* store argc */
+	pushq	%r13
+	/* store fd */
+	pushq	%r12
+	/* store argv index */
+	pushq	%rbx
 
 	/* allocate buff */
 	subq	$BYTES_READ, %rsp
@@ -80,12 +85,19 @@ _start:
 	cmpl	$0, %r13d
 	je	.exit
 
+	movl	$SYS_CLOSE, %eax
+	movl	%r12d, %edi
+	syscall
+
 	incl	%ebx
 	cmpl	%r13d, %ebx
 	jl	.iterate_argv
 
 .exit:
 	addq	$BYTES_READ, %rsp
+	popq	%rbx
+	popq	%r12
+	popq	%r13
 	/* exit(code) */
 	movl	$SYS_EXIT, %eax
 	xorl	%edi, %edi
