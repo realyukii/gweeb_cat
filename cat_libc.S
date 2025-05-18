@@ -6,12 +6,13 @@
 .extern fopen
 .extern perror
 .extern stdout
+.extern stdin
 
 .section .rodata
 open_mode:
 	.string "r"
 usage_str:
-	.string "cat <file>"
+	.string "cat [files]"
 	usage_str_len = . - usage_str
 
 .section .text
@@ -20,8 +21,13 @@ main:
 	pushq	%rbx
 
 	cmpl	$2, %edi
-	jne	.print_usage_exit
+	je	.have_args1
 
+.use_stdin:
+	leaq	stdin(%rip), %rbx
+	jmp	.skip_open
+
+.have_args1:
 	movq	8(%rsi), %rdi
 	leaq	open_mode(%rip), %rsi
 	callq	fopen
@@ -30,6 +36,8 @@ main:
 	je	.failed_to_open
 
 	movq	%rax, %rbx
+
+.skip_open:
 
 	subq	$1024, %rsp
 	
@@ -66,14 +74,6 @@ main:
 
 	popq	%rbx
 	
-	movl	$FAILURE_CODE, %eax
-	retq
-.print_usage_exit:
-	leaq	usage_str(%rip), %rdi
-	callq	puts
-
-	popq	%rbx
-
 	movl	$FAILURE_CODE, %eax
 	retq
 
