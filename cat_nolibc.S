@@ -7,8 +7,9 @@
 .equ STDOUT_FILENO,	1
 .equ O_RDONLY,		0
 .equ BYTES_READ,	1024
-.equ ARGC_POS,		BYTES_READ
-.equ ARGV1_POS,		BYTES_READ+16
+.equ SAVED_RGSTR,	3 * 8
+.equ ARGC_POS,		BYTES_READ + SAVED_RGSTR
+.equ ARGV1_POS,		ARGC_POS + 16
 
 .section .rodata
 failed_open_str:
