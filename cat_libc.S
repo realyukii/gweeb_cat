@@ -24,7 +24,7 @@ main:
 	je	.have_args1
 
 .use_stdin:
-	leaq	stdin(%rip), %rbx
+	movq	stdin(%rip), %rbx
 	jmp	.skip_open
 
 .have_args1:
