@@ -1,3 +1,5 @@
+// TODO: close fd
+// clean callee-saved register
 .equ SYS_EXIT,		60
 .equ SYS_WRITE,		1
 .equ SYS_READ,		0
@@ -10,9 +12,6 @@
 .equ ARGV1_POS,		BYTES_READ+16
 
 .section .rodata
-usage_str:
-	.string "cat [files]\n"
-	usage_str_len = . - usage_str
 failed_open_str:
 	.string "gagal membuka file: "
 	failed_open_str_len = . - failed_open_str

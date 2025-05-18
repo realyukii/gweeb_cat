@@ -15,9 +15,6 @@ failed_open_str:
 	.string "tidak dapat membuka file %s"
 open_mode:
 	.string "r"
-usage_str:
-	.string "cat [files]"
-	usage_str_len = . - usage_str
 
 .section .text
 .global main
