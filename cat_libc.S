@@ -28,6 +28,8 @@ main:
 	pushq	%r13
 	/* store argv ptr */
 	pushq	%r14
+	/* re-align to 16-byte */
+	subq	$8, %rsp
 	/* store buffer from fread */
 	subq	$BUFF_SZ, %rsp
 
@@ -88,6 +90,7 @@ main:
 	jl	.have_argv1
 .exit:
 	addq	$1024, %rsp
+	addq	$8, %rsp
 	popq	%r14
 	popq	%r13
 	popq	%r12
@@ -97,8 +100,8 @@ main:
 	retq
 
 .failed_to_open:
-	/* misalignment will cause program to crash inside sprintf */
-	subq	$1032, %rsp
+	/* caution: misalignment will cause program to crash inside sprintf */
+	subq	$1024, %rsp
 	/* sprintf(char *str, const char *string, ...) */
 	movq	%rsp, %rdi
 	leaq	failed_open_str(%rip), %rsi
@@ -108,7 +111,7 @@ main:
 	movq	%rsp, %rdi
 	callq	perror
 
-	addq	$1032, %rsp
+	addq	$1024, %rsp
 
 	jmp	.finish_reading
 
