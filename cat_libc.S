@@ -52,10 +52,10 @@ main:
 	leaq	open_mode(%rip), %rsi
 	callq	fopen
 
+	movq	%rax, %rbx
+
 	test	%eax, %eax
 	je	.failed_to_open
-
-	movq	%rax, %rbx
 
 .skip_open:
 	
@@ -82,6 +82,9 @@ main:
 	/* handle scenario when only stdin is used */
 	cmpl	$0, %r13d
 	je	.exit
+
+	testl	%ebx, %ebx
+	je		.exit
 
 	movq	%rbx, %rdi
 	callq	fclose
