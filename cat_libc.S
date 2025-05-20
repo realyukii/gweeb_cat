@@ -1,4 +1,4 @@
-#define BUFF_SZ 1024*1024
+#define BUFF_SZ 1024
 #define CONCAT_STR_SZ 1024
 #define ARGV1_POS 8
 
@@ -58,7 +58,7 @@ main:
 
 	movq	%rax, %rbx
 
-	test	%eax, %eax
+	testl	%eax, %eax
 	je	.failed_to_open
 
 .skip_open:
