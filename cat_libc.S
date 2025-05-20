@@ -1,5 +1,9 @@
 #define BUFF_SZ 1024
+#define CONCAT_STR_SZ 1024
 #define ARGV1_POS 8
+
+#define CONCAT_STR_POS 0
+#define BUFF_POS CONCAT_STR_SZ
 
 .extern puts
 .extern fwrite
@@ -23,18 +27,18 @@ main:
 	/* store stdin or file's handle */
 	pushq	%rbx
 	/* store argv index (counter) */
-	pushq	%r12
+	pushq	%rbp
 	/* store argc */
 	pushq	%r13
 	/* store argv ptr */
 	pushq	%r14
 	/* re-align to 16-byte */
-	subq	$8, %rsp
 	/* store buffer from fread */
-	subq	$BUFF_SZ, %rsp
+	/* store concate string */
+	subq	$(8 + BUFF_SZ + CONCAT_STR_SZ), %rsp
 
 	/* zeroes the argv index */
-	xorl	%r12d, %r12d
+	xorl	%ebp, %ebp
 
 	movq	%rsi, %r14
 	movl	%edi, %r13d
@@ -48,7 +52,7 @@ main:
 	jmp	.skip_open
 
 .have_argv1:
-	movq	ARGV1_POS(%r14, %r12, 8), %rdi
+	movq	ARGV1_POS(%r14, %rbp, 8), %rdi
 	leaq	open_mode(%rip), %rsi
 	callq	fopen
 
@@ -61,17 +65,17 @@ main:
 	
 .read_contents:
 	/* size_t fread(void *ptr, size_t size, size_t nmemb, FILE* stream); */
-	movq	%rsp, %rdi
+	movq	BUFF_POS(%rsp), %rdi
 	movl	$1, %esi
-	movl	$1024, %edx
+	movl	$BUFF_SZ, %edx
 	movq	%rbx, %rcx
 	callq	fread
 
-	cmpl	$0, %eax
+	testl	%eax, %eax
 	je	.finish_reading
 
 	/* size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE* stream); */
-	movq	%rsp, %rdi
+	movq	BUFF_POS(%rsp), %rdi
 	movl	$1, %esi
 	movl	%eax, %edx
 	movq	stdout(%rip), %rcx
@@ -80,7 +84,7 @@ main:
 	jmp	.read_contents
 .finish_reading:
 	/* handle scenario when only stdin is used */
-	cmpl	$0, %r13d
+	testl	%r13d, %r13d
 	je	.exit
 
 	testl	%ebx, %ebx
@@ -88,33 +92,29 @@ main:
 
 	movq	%rbx, %rdi
 	callq	fclose
-	incl	%r12d
-	cmpl	%r13d, %r12d
+	incl	%ebp
+	cmpl	%r13d, %ebp
 	jl	.have_argv1
 .exit:
-	addq	$1024, %rsp
-	addq	$8, %rsp
+	addq	$(8 + BUFF_SZ + CONCAT_STR_SZ), %rsp
 	popq	%r14
 	popq	%r13
-	popq	%r12
+	popq	%rbp
 	popq	%rbx
 
 	xorl	%eax, %eax
 	retq
 
 .failed_to_open:
-	/* caution: misalignment will cause program to crash inside sprintf */
-	subq	$1024, %rsp
-	/* sprintf(char *str, const char *string, ...) */
-	movq	%rsp, %rdi
+	/* caution: misalignment will cause program to crash inside sprintf
+	* sprintf(char *str, const char *string, ...) */
+	movq	CONCAT_STR_POS(%rsp), %rdi
 	leaq	failed_open_str(%rip), %rsi
-	movq	ARGV1_POS(%r14, %r12, 8), %rdx
+	movq	ARGV1_POS(%r14, %rbp, 8), %rdx
 	callq sprintf
 
-	movq	%rsp, %rdi
+	movq	CONCAT_STR_POS(%rsp), %rdi
 	callq	perror
-
-	addq	$1024, %rsp
 
 	jmp	.finish_reading
 
