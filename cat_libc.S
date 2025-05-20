@@ -108,12 +108,12 @@ main:
 .failed_to_open:
 	/* caution: misalignment will cause program to crash inside sprintf
 	* sprintf(char *str, const char *string, ...) */
-	movq	CONCAT_STR_POS(%rsp), %rdi
+	leaq	CONCAT_STR_POS(%rsp), %rdi
 	leaq	failed_open_str(%rip), %rsi
 	movq	ARGV1_POS(%r14, %rbp, 8), %rdx
-	callq sprintf
+	callq	sprintf
 
-	movq	CONCAT_STR_POS(%rsp), %rdi
+	leaq	CONCAT_STR_POS(%rsp), %rdi
 	callq	perror
 
 	jmp	.finish_reading
