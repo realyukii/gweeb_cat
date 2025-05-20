@@ -6,7 +6,7 @@
 
 .equ STDOUT_FILENO,	1
 .equ O_RDONLY,		0
-.equ BYTES_READ,	1024
+.equ BYTES_READ,	1024 + 8
 .equ SAVED_RGSTR,	3 * 8
 .equ ARGC_POS,		BYTES_READ + SAVED_RGSTR
 .equ ARGV1_POS,		ARGC_POS + 16
@@ -22,22 +22,22 @@ new_line:
 .global _start
 _start:
 	/* store argc */
-	pushq	%r13
+	pushq	%rbp
 	/* store fd */
 	pushq	%r12
 	/* store argv index */
 	pushq	%rbx
 
-	/* allocate buff */
-	subq	$BYTES_READ, %rsp
+	/* allocate buff + re-alignment */
+	subq	$(BYTES_READ), %rsp
 	/* test argc: to check atleast we have one argument passed */
-	movl	ARGC_POS(%rsp), %r13d
+	movl	ARGC_POS(%rsp), %ebp
 
-	/* decrement argc to fit iterate_argv's evaluation */
-	decl	%r13d
+	/* ignore argv[0] and start index from 1 */
+	decl	%ebp
 
-	cmpl	$1, %r13d
-	jge	.have_args
+	cmpl	$1, %ebp
+	jge		.have_args
 .use_stdin:
 	/* if no argument, put stdin file descriptor instead of fd from opened file */
 	xorl	%r12d, %r12d
@@ -83,22 +83,23 @@ _start:
 
 	jmp	.read_contents
 .finish_reading:
-	cmpl	$0, %r13d
-	je	.exit
+	/* immediately exit if using stdin */
+	cmpl	$0, %ebp
+	je		.exit
 
 	movl	$SYS_CLOSE, %eax
 	movl	%r12d, %edi
 	syscall
-
+.skip_close:
 	incl	%ebx
-	cmpl	%r13d, %ebx
+	cmpl	%ebp, %ebx
 	jl	.iterate_argv
 
 .exit:
 	addq	$BYTES_READ, %rsp
 	popq	%rbx
 	popq	%r12
-	popq	%r13
+	popq	%rbp
 	/* exit(code) */
 	movl	$SYS_EXIT, %eax
 	xorl	%edi, %edi
@@ -117,9 +118,9 @@ _start:
 	movq	ARGV1_POS(%rsp, %rbx, 8), %rax
 .find_len:
 	cmpb	$0, (%rax, %rdx)
-	je	.got_len
+	je		.got_len
 	incl	%edx
-	jmp	.find_len
+	jmp		.find_len
 .got_len:
 	movl	$SYS_WRITE, %eax
 	movl	$STDOUT_FILENO, %edi
@@ -133,4 +134,4 @@ _start:
 	movl	$1, %edx
 	syscall
 
-	jmp .finish_reading
+	jmp .skip_close
