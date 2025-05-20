@@ -48,6 +48,9 @@ main:
 	jge	.have_argv1
 
 .use_stdin:
+	movq  stdin(%rip), %rbx
+	orl  $0x0010, (%rbx)
+	jmp  .skip_open
 	movq	stdin(%rip), %rbx
 	jmp	.skip_open
 
@@ -81,7 +84,7 @@ main:
 	movq	stdout(%rip), %rcx
 	callq	fwrite
 
-	jmp	.read_contents
+	jmp		.read_contents
 .finish_reading:
 	/* handle scenario when only stdin is used */
 	testl	%r13d, %r13d
@@ -91,6 +94,7 @@ main:
 	callq	fclose
 
 .skip_close:
+	/* loop to fopen when argc > 1 */
 	incl	%ebp
 	cmpl	%r13d, %ebp
 	jl		.have_argv1

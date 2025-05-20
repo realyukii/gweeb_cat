@@ -20,3 +20,6 @@
 
 - [passing command-line arguments when using gnu debugger](https://stackoverflow.com/questions/6121094/how-do-i-run-a-program-with-commandline-arguments-using-gdb-within-a-bash-script#6121299)
 - [gdb gef hexdump issue](https://t.me/GNUWeeb/1166032)
+- [use 64-bit register for something related to pointer](https://t.me/GNUWeeb/1166670)
+- https://stackoverflow.com/questions/11177137/why-do-x86-64-instructions-on-32-bit-registers-zero-the-upper-part-of-the-full-6
+- [fix stdin buffering problem](https://t.me/GNUWeeb/1166763)
