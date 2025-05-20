@@ -1,4 +1,4 @@
-#define BUFF_SZ 1024
+#define BUFF_SZ 1024*1024
 #define CONCAT_STR_SZ 1024
 #define ARGV1_POS 8
 
@@ -65,7 +65,7 @@ main:
 	
 .read_contents:
 	/* size_t fread(void *ptr, size_t size, size_t nmemb, FILE* stream); */
-	movq	BUFF_POS(%rsp), %rdi
+	leaq	BUFF_POS(%rsp), %rdi
 	movl	$1, %esi
 	movl	$BUFF_SZ, %edx
 	movq	%rbx, %rcx
@@ -75,7 +75,7 @@ main:
 	je	.finish_reading
 
 	/* size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE* stream); */
-	movq	BUFF_POS(%rsp), %rdi
+	leaq	BUFF_POS(%rsp), %rdi
 	movl	$1, %esi
 	movl	%eax, %edx
 	movq	stdout(%rip), %rcx
