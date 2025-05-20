@@ -56,7 +56,7 @@ _start:
 
 	/* check if file exists */
 	testl	%eax, %eax
-	jl		.failed_open
+	js		.failed_open
 
 	/* save open-file descriptor into register instead of stack */
 	movl	%eax, %r12d
