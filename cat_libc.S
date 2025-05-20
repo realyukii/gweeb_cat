@@ -58,8 +58,8 @@ main:
 
 	movq	%rax, %rbx
 
-	testl	%eax, %eax
-	je	.failed_to_open
+	testq	%rax, %rax
+	je		.failed_to_open
 
 .skip_open:
 	
@@ -72,7 +72,7 @@ main:
 	callq	fread
 
 	testl	%eax, %eax
-	je	.finish_reading
+	je		.finish_reading
 
 	/* size_t fwrite(void *ptr, size_t size, size_t nmemb, FILE* stream); */
 	leaq	BUFF_POS(%rsp), %rdi
@@ -85,16 +85,15 @@ main:
 .finish_reading:
 	/* handle scenario when only stdin is used */
 	testl	%r13d, %r13d
-	je	.exit
-
-	testl	%ebx, %ebx
 	je		.exit
 
 	movq	%rbx, %rdi
 	callq	fclose
+
+.skip_close:
 	incl	%ebp
 	cmpl	%r13d, %ebp
-	jl	.have_argv1
+	jl		.have_argv1
 .exit:
 	addq	$(8 + BUFF_SZ + CONCAT_STR_SZ), %rsp
 	popq	%r14
@@ -116,5 +115,5 @@ main:
 	leaq	CONCAT_STR_POS(%rsp), %rdi
 	callq	perror
 
-	jmp	.finish_reading
+	jmp		.skip_close
 
