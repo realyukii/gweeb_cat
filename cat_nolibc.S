@@ -41,7 +41,7 @@ _start:
 .use_stdin:
 	/* if no argument, put stdin file descriptor instead of fd from opened file */
 	xorl	%r12d, %r12d
-	jmp	.skip_open
+	jmp		.skip_open
 .have_args:
 	/* counter for iterating through cmdline args */
 	xorl	%ebx, %ebx
@@ -55,8 +55,8 @@ _start:
 	syscall
 
 	/* check if file exists */
-	cmpl	$0, %eax
-	jl	.failed_open
+	testl	%eax, %eax
+	jl		.failed_open
 
 	/* save open-file descriptor into register instead of stack */
 	movl	%eax, %r12d
@@ -71,7 +71,7 @@ _start:
 	syscall
 
 	/* total bytes readed from read */
-	cmpl	$0, %eax
+	testl	%eax, %eax
 	je	.finish_reading
 
 	/* write(fd, buff_ptr, buff_len) */
@@ -84,7 +84,7 @@ _start:
 	jmp	.read_contents
 .finish_reading:
 	/* immediately exit if using stdin */
-	cmpl	$0, %ebp
+	testl	%ebp, %ebp
 	je		.exit
 
 	movl	$SYS_CLOSE, %eax
